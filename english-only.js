@@ -1,0 +1,5 @@
+(function(root){
+const jp=/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u;
+function separate(text){const en=[];for(let line of String(text).split(/\r?\n/)){line=line.trim();if(!line){if(en.length&&en.at(-1)!=='')en.push('');continue}if(/^(?:出典|参考文献|source|references?)\s*[:：]/i.test(line)||/^(?:英語|英文|日本語|和訳|English|Japanese|Translation)\s*[:：]?$/i.test(line)||/^\d+[.)．]?\s*$/.test(line))continue;line=line.replace(/^\d+[.)．]\s*/,'');const parts=line.split(/(?<=[。！？])\s*|(?<=[.!?])(?:\s+|(?=[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]))/u);for(const part of parts){const s=part.trim();if(!s)continue;if(jp.test(s)){const lead=s.match(/^([\x20-\x7e]+?[.!?])\s*(?=[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}])/u);if(lead){en.push(lead[1]);}}else if(/[A-Za-z]/.test(s))en.push(s)}}return {text:en.join('\n').replace(/\n{3,}/g,'\n\n').trim()}}
+function prepare(text,split,splitter){const clean=separate(text).text;return !clean?[]:(split?splitter(clean):[clean]).map(text=>({text}));}
+root.Bilingual={separate,prepare};})(globalThis);
